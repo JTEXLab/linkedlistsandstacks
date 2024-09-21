@@ -1,0 +1,146 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+
+class Node {
+public:
+    char the_data;
+    Node* next;
+
+    Node() : next(nullptr) {}
+    
+    void print() {
+        cout << the_data << " ";
+        if (next) {
+            next->print();
+        }
+    }
+};
+
+class LinkedList {
+private:
+    Node* head;
+    Node* tail;
+
+public:
+    LinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Enqueue function to add a node at the tail
+    void enqueue(char value) {
+        Node* newNode = new Node();
+        newNode->the_data = value;
+        newNode->next = nullptr;
+
+        if (tail == nullptr) { // List is empty
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+    }
+
+    // Dequeue function to remove a node from the head
+    char dequeue() {
+        if (head == nullptr) { // List is empty
+            throw std::out_of_range("Queue is empty");
+        }
+
+        Node* temp = head;
+        char value = head->the_data;
+        head = head->next;
+
+        if (head == nullptr) { // List is now empty
+            tail = nullptr;
+        }
+
+        delete temp;
+        return value;
+    }
+
+    // Reverse print function to print the list in reverse order
+    void reverseprint(Node* node) {
+        if (node == nullptr) return;
+        reverseprint(node->next);
+        cout << node->the_data << " ";
+    }
+
+    void reverseprint() {
+        reverseprint(head);
+        cout << endl;
+    }
+
+    // Function to print the list
+    void print() {
+        if (head) head->print();
+        cout << endl;
+    }
+
+    // Helper function to get the head node (for reverse print)
+    Node* getHead() {
+        return head;
+    }
+
+    // Function to check if brackets are correctly nested
+    int check(const string& str) {
+        stack<char> s;
+        for (char ch : str) {
+            if(ch == '(' || ch == '[' || ch == '{' || ch == '<') {
+                s.push(ch);
+            } else if (ch == ')' || ch == ']' || ch == '}' || ch == '>') {
+                if (s.empty() || !isMatchingPair(s.top(), ch)) {
+                    return 0;
+                }
+                s.pop();
+            }
+        }
+        return s.empty() ? 1 : 0;
+    }
+
+private:
+    // Helper function to match brackets
+    bool isMatchingPair(char open, char close) {
+        return (open == '(' && close == ')') ||
+               (open == '[' && close == ']') ||
+               (open == '{' && close == '}') ||
+               (open == '<' && close == '>');
+    }
+};
+
+int main() {
+    LinkedList list;
+
+    // Adding nodes to the list using enqueue
+    list.enqueue("(");
+    list.enqueue(')');
+    list.enqueue('[');
+    list.enqueue(']');
+    list.enqueue('{');
+    list.enqueue('}');
+    list.enqueue('<');
+    list.enqueue('>');
+
+    // Printing the list
+    cout << "Original list: ";
+    list.print();
+
+    // Reverse printing the list
+    cout << "Reverse list: ";
+    list.reverseprint();
+
+    // Checking nested brackets
+    string test1 = "({[]})";
+    string test2 = "([)]";
+
+    cout << "Check test1: " << list.check(test1) << endl;
+    cout << "Check test2: " << list.check(test2) << endl;
+
+    // Dequeueing nodes from the list
+    cout << "Dequeued: " << list.dequeue() << endl;
+    cout << "Dequeued: " << list.dequeue() << endl;
+
+    // Printing the list again
+    cout << "List after dequeues: ";
+    list.print();
+
+    return 0;
+}
